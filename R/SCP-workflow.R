@@ -1665,7 +1665,7 @@ scVI_integrate <- function(srtMerge = NULL, batch = NULL, append = TRUE, srtList
     model$train()
     srtIntegrated <- srtMerge
     srtMerge <- NULL
-    corrected <- t(as_matrix(model$get_normalized_expression()))
+    corrected <- t(Matrix::as.matrix(model$get_normalized_expression()))
     srtIntegrated[["scVIcorrected"]] <- CreateAssayObject(counts = corrected)
     DefaultAssay(srtIntegrated) <- "scVIcorrected"
     VariableFeatures(srtIntegrated[["scVIcorrected"]]) <- HVF
@@ -1684,7 +1684,7 @@ scVI_integrate <- function(srtMerge = NULL, batch = NULL, append = TRUE, srtList
     srtMerge <- NULL
   }
 
-  latent <- as_matrix(model$get_latent_representation())
+  latent <- Matrix::as.matrix(model$get_latent_representation())
   rownames(latent) <- colnames(srtIntegrated)
   colnames(latent) <- paste0("scVI_", seq_len(ncol(latent)))
   srtIntegrated[["scVI"]] <- CreateDimReducObject(embeddings = latent, key = "scVI_", assay = DefaultAssay(srtIntegrated))
@@ -1854,7 +1854,7 @@ MNN_integrate <- function(srtMerge = NULL, batch = NULL, append = TRUE, srtList 
   sceList <- lapply(srtList, function(srt) {
     sce <- as.SingleCellExperiment(CreateSeuratObject(counts = GetAssayData(srt, slot = "data", assay = DefaultAssay(srt))[HVF, , drop = FALSE]))
     if (inherits(sce@assays@data$logcounts, "dgCMatrix")) {
-      sce@assays@data$logcounts <- as_matrix(sce@assays@data$logcounts)
+      sce@assays@data$logcounts <- Matrix::as.matrix(sce@assays@data$logcounts)
     }
     return(sce)
   })
@@ -2039,7 +2039,7 @@ fastMNN_integrate <- function(srtMerge = NULL, batch = NULL, append = TRUE, srtL
   sceList <- lapply(srtList, function(srt) {
     sce <- as.SingleCellExperiment(CreateSeuratObject(counts = GetAssayData(srt, slot = "data", assay = DefaultAssay(srt))[HVF, , drop = FALSE]))
     if (inherits(sce@assays@data$logcounts, "dgCMatrix")) {
-      sce@assays@data$logcounts <- as_matrix(sce@assays@data$logcounts)
+      sce@assays@data$logcounts <- Matrix::as.matrix(sce@assays@data$logcounts)
     }
     return(sce)
   })
@@ -2058,7 +2058,7 @@ fastMNN_integrate <- function(srtMerge = NULL, batch = NULL, append = TRUE, srtL
 
   srtIntegrated <- srtMerge
   srtMerge <- NULL
-  srtIntegrated[["fastMNNcorrected"]] <- CreateAssayObject(counts = as_matrix(out@assays@data$reconstructed))
+  srtIntegrated[["fastMNNcorrected"]] <- CreateAssayObject(counts = Matrix::as.matrix(out@assays@data$reconstructed))
   DefaultAssay(srtIntegrated) <- "fastMNNcorrected"
   VariableFeatures(srtIntegrated[["fastMNNcorrected"]]) <- HVF
   reduction <- out@int_colData$reducedDims$corrected
@@ -2423,7 +2423,7 @@ Scanorama_integrate <- function(srtMerge = NULL, batch = NULL, append = TRUE, sr
   assaylist <- list()
   genelist <- list()
   for (i in seq_along(srtList)) {
-    assaylist[[i]] <- t(as_matrix(GetAssayData(object = srtList[[i]], slot = "data", assay = DefaultAssay(srtList[[i]]))[HVF, , drop = FALSE]))
+    assaylist[[i]] <- t(Matrix::as.matrix(GetAssayData(object = srtList[[i]], slot = "data", assay = DefaultAssay(srtList[[i]]))[HVF, , drop = FALSE]))
     genelist[[i]] <- HVF
   }
   if (isTRUE(return_corrected)) {

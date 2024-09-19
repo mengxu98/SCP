@@ -1586,7 +1586,7 @@ CellDimPlot <- function(srt, group.by, reduction = NULL, dims = c(1, 2), split.b
     }
 
     if (!is.null(graph)) {
-      net_mat <- as_matrix(graph)[rownames(dat), rownames(dat)]
+      net_mat <- Matrix::as.matrix(graph)[rownames(dat), rownames(dat)]
       net_mat[net_mat == 0] <- NA
       net_mat[upper.tri(net_mat)] <- NA
       net_df <- reshape2::melt(net_mat, na.rm = TRUE, stringsAsFactors = FALSE)
@@ -2159,24 +2159,24 @@ FeatureDimPlot <- function(srt, features, reduction = NULL, dims = c(1, 2), spli
 
   if (length(features_gene) > 0) {
     if (all(rownames(srt@assays[[assay]]) %in% features_gene)) {
-      dat_gene <- t(as_matrix(slot(srt@assays[[assay]], slot)))
+      dat_gene <- t(Matrix::as.matrix(slot(srt@assays[[assay]], slot)))
     } else {
-      dat_gene <- t(as_matrix(slot(srt@assays[[assay]], slot)[features_gene, , drop = FALSE]))
+      dat_gene <- t(Matrix::as.matrix(slot(srt@assays[[assay]], slot)[features_gene, , drop = FALSE]))
     }
   } else {
     dat_gene <- matrix(nrow = ncol(srt@assays[[1]]), ncol = 0)
   }
   if (length(features_meta) > 0) {
-    dat_meta <- as_matrix(srt@meta.data[, features_meta, drop = FALSE])
+    dat_meta <- Matrix::as.matrix(srt@meta.data[, features_meta, drop = FALSE])
   } else {
     dat_meta <- matrix(nrow = ncol(srt@assays[[1]]), ncol = 0)
   }
   if (length(features_embedding) > 0) {
-    dat_embedding <- as_matrix(FetchData(srt, vars = features_embedding))
+    dat_embedding <- Matrix::as.matrix(FetchData(srt, vars = features_embedding))
   } else {
     dat_embedding <- matrix(nrow = ncol(srt@assays[[1]]), ncol = 0)
   }
-  dat_exp <- as_matrix(do.call(cbind, list(dat_gene, dat_meta, dat_embedding)))
+  dat_exp <- Matrix::as.matrix(do.call(cbind, list(dat_gene, dat_meta, dat_embedding)))
   features <- unique(features[features %in% c(features_gene, features_meta, features_embedding)])
 
   if (!is.numeric(dat_exp) && !inherits(dat_exp, "Matrix")) {
@@ -2321,7 +2321,7 @@ FeatureDimPlot <- function(srt, features, reduction = NULL, dims = c(1, 2), spli
         cells.highlight_use <- rownames(dat)[dat[["color_blend"]] != bg_color]
       }
       if (!is.null(graph)) {
-        net_mat <- as_matrix(graph)[rownames(dat), rownames(dat)]
+        net_mat <- Matrix::as.matrix(graph)[rownames(dat), rownames(dat)]
         net_mat[net_mat == 0] <- NA
         net_mat[upper.tri(net_mat)] <- NA
         net_df <- melt(net_mat, na.rm = TRUE, stringsAsFactors = FALSE)
@@ -2590,7 +2590,7 @@ FeatureDimPlot <- function(srt, features, reduction = NULL, dims = c(1, 2), spli
             colors_value <- seq(lower_cutoff %||% quantile(dat_exp[is.finite(dat_exp[, f]), f], lower_quantile, na.rm = TRUE), upper_cutoff %||% quantile(dat_exp[is.finite(dat_exp[, f]), f], upper_quantile, na.rm = TRUE) + 0.001, length.out = 100)
           }
           if (keep_scale == "all") {
-            all_values <- as_matrix(dat_exp[, features])
+            all_values <- Matrix::as.matrix(dat_exp[, features])
             colors_value <- seq(lower_cutoff %||% quantile(all_values[is.finite(all_values)], lower_quantile, na.rm = TRUE), upper_cutoff %||% quantile(all_values, upper_quantile, na.rm = TRUE) + 0.001, length.out = 100)
           }
         }
@@ -2598,7 +2598,7 @@ FeatureDimPlot <- function(srt, features, reduction = NULL, dims = c(1, 2), spli
       dat[which(dat[, "value"] > max(colors_value, na.rm = TRUE)), "value"] <- max(colors_value, na.rm = TRUE)
       dat[which(dat[, "value"] < min(colors_value, na.rm = TRUE)), "value"] <- min(colors_value, na.rm = TRUE)
       if (!is.null(graph)) {
-        net_mat <- as_matrix(graph)[rownames(dat), rownames(dat)]
+        net_mat <- Matrix::as.matrix(graph)[rownames(dat), rownames(dat)]
         net_mat[net_mat == 0] <- NA
         net_mat[upper.tri(net_mat)] <- NA
         net_df <- melt(net_mat, na.rm = TRUE, stringsAsFactors = FALSE)
@@ -3168,24 +3168,24 @@ FeatureDimPlot3D <- function(srt, features, reduction = NULL, dims = c(1, 2, 3),
 
   if (length(features_gene) > 0) {
     if (all(rownames(srt@assays[[assay]]) %in% features_gene)) {
-      dat_gene <- t(as_matrix(slot(srt@assays[[assay]], slot)))
+      dat_gene <- t(Matrix::as.matrix(slot(srt@assays[[assay]], slot)))
     } else {
-      dat_gene <- t(as_matrix(slot(srt@assays[[assay]], slot)[features_gene, , drop = FALSE]))
+      dat_gene <- t(Matrix::as.matrix(slot(srt@assays[[assay]], slot)[features_gene, , drop = FALSE]))
     }
   } else {
     dat_gene <- matrix(nrow = ncol(srt@assays[[1]]), ncol = 0)
   }
   if (length(features_meta) > 0) {
-    dat_meta <- as_matrix(srt@meta.data[, features_meta, drop = FALSE])
+    dat_meta <- Matrix::as.matrix(srt@meta.data[, features_meta, drop = FALSE])
   } else {
     dat_meta <- matrix(nrow = ncol(srt@assays[[1]]), ncol = 0)
   }
   if (length(features_embedding) > 0) {
-    dat_embedding <- as_matrix(FetchData(srt, vars = features_embedding))
+    dat_embedding <- Matrix::as.matrix(FetchData(srt, vars = features_embedding))
   } else {
     dat_embedding <- matrix(nrow = ncol(srt@assays[[1]]), ncol = 0)
   }
-  dat_exp <- as_matrix(do.call(cbind, list(dat_gene, dat_meta, dat_embedding)))
+  dat_exp <- Matrix::as.matrix(do.call(cbind, list(dat_gene, dat_meta, dat_embedding)))
   features <- unique(features[features %in% c(features_gene, features_meta, features_embedding)])
 
   if (!is.numeric(dat_exp) && !inherits(dat_exp, "Matrix")) {
@@ -3509,7 +3509,7 @@ FeatureDimPlot3D <- function(srt, features, reduction = NULL, dims = c(1, 2, 3),
 #'
 #' library(Matrix)
 #' data <- pancreas_sub@assays$RNA@data
-#' pancreas_sub@assays$RNA@scale.data <- as_matrix(data / rowMeans(data))
+#' pancreas_sub@assays$RNA@scale.data <- Matrix::as.matrix(data / rowMeans(data))
 #' FeatureStatPlot(pancreas_sub,
 #'   stat.by = c("Neurog3", "Rbp4", "Ins1"), group.by = "CellType",
 #'   slot = "scale.data", ylab = "FoldChange", same.y.lims = TRUE, y.max = 4
@@ -3878,7 +3878,7 @@ ExpressionStatPlot <- function(exp.data, meta.data, stat.by, group.by = NULL, sp
     dat_gene <- matrix(nrow = length(allcells), ncol = 0)
   }
   if (length(features_meta) > 0) {
-    dat_meta <- as_matrix(meta.data[, features_meta, drop = FALSE])
+    dat_meta <- Matrix::as.matrix(meta.data[, features_meta, drop = FALSE])
   } else {
     dat_meta <- matrix(nrow = length(allcells), ncol = 0)
   }
@@ -3913,7 +3913,7 @@ ExpressionStatPlot <- function(exp.data, meta.data, stat.by, group.by = NULL, sp
   }
 
   if (isTRUE(same.y.lims)) {
-    valus <- as_matrix(dat_use[, stat.by, drop = FALSE])[is.finite(as_matrix(dat_use[, stat.by, drop = FALSE]))]
+    valus <- Matrix::as.matrix(dat_use[, stat.by, drop = FALSE])[is.finite(Matrix::as.matrix(dat_use[, stat.by, drop = FALSE]))]
     if (is.null(y.max)) {
       y.max <- max(valus, na.rm = TRUE)
     } else if (is.character(y.max)) {
@@ -5311,7 +5311,7 @@ FeatureCorPlot <- function(srt, features, group.by = NULL, split.by = NULL, cell
     dat_gene <- matrix(nrow = ncol(srt@assays[[1]]), ncol = 0)
   }
   if (length(features_meta) > 0) {
-    dat_meta <- as_matrix(srt@meta.data[, features_meta, drop = FALSE])
+    dat_meta <- Matrix::as.matrix(srt@meta.data[, features_meta, drop = FALSE])
   } else {
     dat_meta <- matrix(nrow = ncol(srt@assays[[1]]), ncol = 0)
   }
@@ -5325,7 +5325,7 @@ FeatureCorPlot <- function(srt, features, group.by = NULL, split.by = NULL, cell
     stop("'features' must be type of numeric variable.")
   }
   if (!inherits(dat_exp, "dgCMatrix")) {
-    dat_exp <- as.sparse(as_matrix(dat_exp))
+    dat_exp <- as.sparse(Matrix::as.matrix(dat_exp))
   }
   if (length(features) > 10 && !isTRUE(force)) {
     warning("More than 10 features to be paired compared which will generate more than 50 plots.", immediate. = TRUE)
@@ -5734,7 +5734,7 @@ CellDensityPlot <- function(srt, features, group.by = NULL, split.by = NULL, ass
     dat_gene <- matrix(nrow = ncol(srt@assays[[1]]), ncol = 0)
   }
   if (length(features_meta) > 0) {
-    dat_meta <- as_matrix(srt@meta.data[, features_meta, drop = FALSE])
+    dat_meta <- Matrix::as.matrix(srt@meta.data[, features_meta, drop = FALSE])
   } else {
     dat_meta <- matrix(nrow = ncol(srt@assays[[1]]), ncol = 0)
   }
@@ -5758,10 +5758,10 @@ CellDensityPlot <- function(srt, features, group.by = NULL, split.by = NULL, ass
   }
 
   if (isTRUE(same.y.lims) && is.null(y.max)) {
-    y.max <- max(as_matrix(dat_exp[, features])[is.finite(as_matrix(dat_exp[, features]))], na.rm = TRUE)
+    y.max <- max(Matrix::as.matrix(dat_exp[, features])[is.finite(Matrix::as.matrix(dat_exp[, features]))], na.rm = TRUE)
   }
   if (isTRUE(same.y.lims) && is.null(y.min)) {
-    y.min <- min(as_matrix(dat_exp[, features])[is.finite(as_matrix(dat_exp[, features]))], na.rm = TRUE)
+    y.min <- min(Matrix::as.matrix(dat_exp[, features])[is.finite(Matrix::as.matrix(dat_exp[, features]))], na.rm = TRUE)
   }
 
   plist <- list()
@@ -6190,7 +6190,7 @@ PAGAPlot <- function(srt, paga = srt@misc$paga, type = "connectivities",
   }
 
   out <- GraphPlot(
-    node = dat, edge = as_matrix(connectivities), node_coord = paste0(reduction_key, dims),
+    node = dat, edge = Matrix::as.matrix(connectivities), node_coord = paste0(reduction_key, dims),
     node_group = groups, node_palette = node_palette, node_palcolor = node_palcolor, node_size = node_size, node_alpha = node_alpha,
     node_highlight = node_highlight, node_highlight_color = node_highlight_color,
     label = label, label.size = label.size, label.fg = label.fg, label.bg = label.bg, label.bg.r = label.bg.r,
@@ -6462,7 +6462,7 @@ GraphPlot <- function(node, edge, transition = NULL,
   }
 
   if (!is.null(transition)) {
-    trans2 <- trans1 <- as_matrix(transition)
+    trans2 <- trans1 <- Matrix::as.matrix(transition)
     trans1[lower.tri(trans1)] <- 0
     trans2[upper.tri(trans2)] <- 0
     trans <- t(trans1) - trans2
@@ -6981,7 +6981,7 @@ compute_velocity_on_grid <- function(X_emb, V_emb,
     gr <- seq(m, M, length.out = ceiling(50 * density))
     grs <- c(grs, list(gr))
   }
-  X_grid <- as_matrix(expand.grid(grs))
+  X_grid <- Matrix::as.matrix(expand.grid(grs))
 
   d <- dist(
     x = as.sparse(X_emb),
@@ -6989,8 +6989,8 @@ compute_velocity_on_grid <- function(X_emb, V_emb,
     method = "euclidean",
     use_nan = TRUE
   )
-  neighbors <- t(as_matrix(apply(d, 2, function(x) order(x, decreasing = FALSE)[1:n_neighbors])))
-  dists <- t(as_matrix(apply(d, 2, function(x) x[order(x, decreasing = FALSE)[1:n_neighbors]])))
+  neighbors <- t(Matrix::as.matrix(apply(d, 2, function(x) order(x, decreasing = FALSE)[1:n_neighbors])))
+  dists <- t(Matrix::as.matrix(apply(d, 2, function(x) x[order(x, decreasing = FALSE)[1:n_neighbors]])))
 
   # ggplot() +
   #   annotate(geom = "point", x = X_grid[, 1], y = X_grid[, 2]) +
@@ -8152,7 +8152,7 @@ GroupHeatmap <- function(srt, features = NULL, group.by = NULL, split.by = NULL,
   gene_unique <- features_unique[features %in% rownames(srt@assays[[assay]])]
   meta <- features[features %in% colnames(srt@meta.data)]
 
-  mat_raw <- as_matrix(rbind(slot(srt@assays[[assay]], slot)[gene, cells, drop = FALSE], t(srt@meta.data[cells, meta, drop = FALSE])))[features, , drop = FALSE]
+  mat_raw <- Matrix::as.matrix(rbind(slot(srt@assays[[assay]], slot)[gene, cells, drop = FALSE], t(srt@meta.data[cells, meta, drop = FALSE])))[features, , drop = FALSE]
   rownames(mat_raw) <- features_unique
   if (isTRUE(lib_normalize) && min(mat_raw, na.rm = TRUE) >= 0) {
     if (!is.null(libsize)) {
@@ -9337,7 +9337,7 @@ FeatureHeatmap <- function(srt, features = NULL, cells = NULL, group.by = NULL, 
   gene_unique <- features_unique[features %in% rownames(srt@assays[[assay]])]
   meta <- features[features %in% colnames(srt@meta.data)]
   all_cells <- unique(unlist(lapply(cell_groups, names)))
-  mat_raw <- as_matrix(rbind(slot(srt@assays[[assay]], slot)[gene, all_cells, drop = FALSE], t(srt@meta.data[all_cells, meta, drop = FALSE])))[features, , drop = FALSE]
+  mat_raw <- Matrix::as.matrix(rbind(slot(srt@assays[[assay]], slot)[gene, all_cells, drop = FALSE], t(srt@meta.data[all_cells, meta, drop = FALSE])))[features, , drop = FALSE]
   rownames(mat_raw) <- features_unique
   if (isTRUE(lib_normalize) && min(mat_raw, na.rm = TRUE) >= 0) {
     if (!is.null(libsize)) {
@@ -10193,10 +10193,10 @@ CellCorHeatmap <- function(srt_query, srt_ref = NULL, bulk_ref = NULL,
   distance_matrix <- srt_query@tools[[paste0(prefix, "_classification")]][["distance_matrix"]]
   distance_metric <- srt_query@tools[[paste0(prefix, "_classification")]][["distance_metric"]]
   if (distance_metric %in% simil_method) {
-    simil_matrix <- t(as_matrix(1 - distance_matrix))
+    simil_matrix <- t(Matrix::as.matrix(1 - distance_matrix))
     simil_name <- paste0(capitalize(distance_metric), " similarity")
   } else if (distance_metric %in% dist_method) {
-    simil_matrix <- t(as_matrix(1 - distance_matrix / max(distance_matrix, na.rm = TRUE)))
+    simil_matrix <- t(Matrix::as.matrix(1 - distance_matrix / max(distance_matrix, na.rm = TRUE)))
     simil_name <- paste0("1-dist[", distance_metric, "]/max(dist[", distance_metric, "])")
   }
   simil_matrix[is.infinite(simil_matrix)] <- max(abs(simil_matrix[!is.infinite(simil_matrix)]), na.rm = TRUE) * ifelse(simil_matrix[is.infinite(simil_matrix)] > 0, 1, -1)
@@ -11282,7 +11282,7 @@ DynamicHeatmap <- function(srt, lineages, features = NULL, use_fitted = FALSE, b
     Y_libsize <- colSums(slot(srt@assays[[assay]], "counts"))
     for (l in lineages) {
       cells <- gsub(pattern = l, replacement = "", x = cell_order_list[[l]])
-      mat_tmp <- as_matrix(rbind(slot(srt@assays[[assay]], slot)[gene, cells, drop = FALSE], t(srt@meta.data[cells, meta, drop = FALSE])))[features, , drop = FALSE]
+      mat_tmp <- Matrix::as.matrix(rbind(slot(srt@assays[[assay]], slot)[gene, cells, drop = FALSE], t(srt@meta.data[cells, meta, drop = FALSE])))[features, , drop = FALSE]
       if (isTRUE(lib_normalize) && min(mat_tmp, na.rm = TRUE) >= 0) {
         if (!is.null(libsize)) {
           libsize_use <- libsize
@@ -12160,10 +12160,10 @@ DynamicPlot <- function(srt, lineages, features, group.by = NULL, cells = NULL, 
       upr_matrix <- cbind(upr_matrix, srt_tmp@tools[[paste0("DynamicFeatures_", l)]][["upr_matrix"]][, feature_calcu, drop = FALSE])
       lwr_matrix <- cbind(lwr_matrix, srt_tmp@tools[[paste0("DynamicFeatures_", l)]][["lwr_matrix"]][, feature_calcu, drop = FALSE])
     }
-    raw_matrix_list[[l]] <- as_matrix(raw_matrix[, features, drop = FALSE])
-    fitted_matrix_list[[l]] <- as_matrix(fitted_matrix[, features, drop = FALSE])
-    upr_matrix_list[[l]] <- as_matrix(upr_matrix[, features, drop = FALSE])
-    lwr_matrix_list[[l]] <- as_matrix(lwr_matrix[, features, drop = FALSE])
+    raw_matrix_list[[l]] <- Matrix::as.matrix(raw_matrix[, features, drop = FALSE])
+    fitted_matrix_list[[l]] <- Matrix::as.matrix(fitted_matrix[, features, drop = FALSE])
+    upr_matrix_list[[l]] <- Matrix::as.matrix(upr_matrix[, features, drop = FALSE])
+    lwr_matrix_list[[l]] <- Matrix::as.matrix(lwr_matrix[, features, drop = FALSE])
     cell_union <- unique(c(cell_union, rownames(raw_matrix)))
   }
 
@@ -13470,7 +13470,7 @@ adjustlayout <- function(graph, layout, width, height = 2, scale = 100, iter = 1
   # }
 
   for (i in seq_len(iter)) {
-    dist_matrix <- as_matrix(dist(layout))
+    dist_matrix <- Matrix::as.matrix(dist(layout))
     nearest_neighbors <- apply(dist_matrix, 2, function(x) which(x == min(x[x > 0])), simplify = FALSE)
     # nearest_neighbors <- apply(dist_matrix, 2, function(x) {
     #   head(order(x), 3)[-1]

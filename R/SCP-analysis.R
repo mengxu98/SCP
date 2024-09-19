@@ -60,7 +60,7 @@
 #'   by = list(res$geneID_expand[, "symbol"]), FUN = sum
 #' )
 #' rownames(homologs_counts) <- homologs_counts[, 1]
-#' homologs_counts <- as(as_matrix(homologs_counts[, -1]), "dgCMatrix")
+#' homologs_counts <- as(Matrix::as.matrix(homologs_counts[, -1]), "dgCMatrix")
 #' homologs_counts
 #'
 #' @importFrom R.cache loadCache saveCache
@@ -621,14 +621,14 @@ AddModuleScore2 <- function(object, slot = "data", features, pool = NULL, nbin =
   #   return(list(features.use, ctrl.use))
   # }, BPPARAM = BPPARAM)
   # features.scores <- bpaggregate(
-  #   x = as_matrix(assay.data[unlist(lapply(features_collapse, function(x) x[[1]])), ]),
+  #   x = Matrix::as.matrix(assay.data[unlist(lapply(features_collapse, function(x) x[[1]])), ]),
   #   by = list(unlist(lapply(1:length(features_collapse), function(x) rep(x, length(features_collapse[[x]][[1]]))))),
   #   FUN = mean,
   #   BPPARAM = BPPARAM
   # )
   # features.scores <- features.scores[,-1]
   # ctrl.scores <- bpaggregate(
-  #   x = as_matrix(assay.data[unlist(lapply(features_collapse, function(x) x[[2]])), ]),
+  #   x = Matrix::as.matrix(assay.data[unlist(lapply(features_collapse, function(x) x[[2]])), ]),
   #   by = list(unlist(lapply(1:length(features_collapse), function(x) rep(x, length(features_collapse[[x]][[2]]))))),
   #   FUN = mean,
   #   BPPARAM = BPPARAM
@@ -862,7 +862,7 @@ CellScoring <- function(srt, features = NULL, slot = "data", assay = NULL, split
       colnames(scores) <- make.names(paste(name, names(features_nm), sep = "_"))
     } else if (method == "AUCell") {
       check_R("AUCell")
-      CellRank <- AUCell::AUCell_buildRankings(as_matrix(GetAssayData(srt_sp, slot = slot, assay = assay)), BPPARAM = BPPARAM, plotStats = FALSE)
+      CellRank <- AUCell::AUCell_buildRankings(Matrix::as.matrix(GetAssayData(srt_sp, slot = slot, assay = assay)), BPPARAM = BPPARAM, plotStats = FALSE)
       cells_AUC <- AUCell::AUCell_calcAUC(
         geneSets = features,
         rankings = CellRank,
@@ -885,7 +885,7 @@ CellScoring <- function(srt, features = NULL, slot = "data", assay = NULL, split
   scores_mat <- do.call(rbind, lapply(scores_list, function(x) x[intersect(rownames(x), colnames(srt)), features_used, drop = FALSE]))
 
   if (isTRUE(new_assay)) {
-    srt[[name]] <- CreateAssayObject(counts = t(as_matrix(scores_mat[colnames(srt), , drop = FALSE])))
+    srt[[name]] <- CreateAssayObject(counts = t(Matrix::as.matrix(scores_mat[colnames(srt), , drop = FALSE])))
     srt[[name]] <- AddMetaData(object = srt[[name]], metadata = data.frame(termnames = features_nm_used[colnames(scores_mat)]))
   } else {
     srt <- AddMetaData(object = srt, metadata = scores_mat)
@@ -1267,7 +1267,7 @@ FindExpressedMarkers <- function(object, ident.1 = NULL, ident.2 = NULL, cells.1
   )
   data.use <- GetAssayData(object = object, slot = data.slot)
   data.use <- data.use[rowSums(data.use) > 0, ]
-  data.use <- as_matrix(data.use)
+  data.use <- Matrix::as.matrix(data.use)
   data.use[data.use <= min.expression] <- NA
   counts <- switch(
     EXPR = data.slot,
@@ -1464,7 +1464,7 @@ PerformDE <- function(object, cells.1, cells.2, features, test.use, verbose, min
     )
   }
   data.use <- object[features, c(cells.1, cells.2), drop = FALSE]
-  data.use <- as_matrix(data.use)
+  data.use <- Matrix::as.matrix(data.use)
 
   de.results <- switch(
     EXPR = test.use,
@@ -4511,8 +4511,8 @@ orderCells <- function(cds, root_state = NULL, num_paths = NULL, reverse = NULL)
       num_paths <- 1
     }
     adjusted_S <- t(cds@reducedDimS)
-    dp <- as_matrix(stats::dist(adjusted_S))
-    cellPairwiseDistances(cds) <- as_matrix(stats::dist(adjusted_S))
+    dp <- Matrix::as.matrix(stats::dist(adjusted_S))
+    cellPairwiseDistances(cds) <- Matrix::as.matrix(stats::dist(adjusted_S))
     gp <- igraph::graph.adjacency(dp, mode = "undirected", weighted = TRUE)
     dp_mst <- igraph::minimum.spanning.tree(gp)
     monocle::minSpanningTree(cds) <- dp_mst
@@ -4584,7 +4584,7 @@ project2MST <- function(cds, Projection_Method) {
   cds <- monocle:::findNearestPointOnMST(cds)
   closest_vertex <- cds@auxOrderingData[["DDRTree"]]$pr_graph_cell_proj_closest_vertex
   closest_vertex_names <- colnames(Y)[closest_vertex]
-  closest_vertex_df <- as_matrix(closest_vertex)
+  closest_vertex_df <- Matrix::as.matrix(closest_vertex)
   row.names(closest_vertex_df) <- row.names(closest_vertex)
   tip_leaves <- names(which(igraph::degree(dp_mst) == 1))
   if (!is.function(Projection_Method)) {
@@ -4606,13 +4606,13 @@ project2MST <- function(cds, Projection_Method) {
         distance <- c(distance, stats::dist(rbind(Z_i, tmp)))
       }
       if (!inherits(projection, "matrix")) {
-        projection <- as_matrix(projection)
+        projection <- Matrix::as.matrix(projection)
       }
       P[, i] <- projection[which(distance == min(distance))[1], ]
     }
   }
   colnames(P) <- colnames(Z)
-  dp <- as_matrix(stats::dist(t(P)))
+  dp <- Matrix::as.matrix(stats::dist(t(P)))
   min_dist <- min(dp[dp != 0])
   dp <- dp + min_dist
   diag(dp) <- 0
@@ -5052,9 +5052,9 @@ RunDynamicFeatures <- function(srt, lineages, features = NULL, suffix = lineages
     t <- srt_sub[[l, drop = TRUE]]
     t <- t[is.finite(t)]
     t_ordered <- t[order(t)]
-    Y_ordered <- as_matrix(Y[features, names(t_ordered), drop = FALSE])
+    Y_ordered <- Matrix::as.matrix(Y[features, names(t_ordered), drop = FALSE])
     l_libsize <- Y_libsize[names(t_ordered)]
-    raw_matrix <- as_matrix(cbind(data.frame(pseudotime = t_ordered), t(Y_ordered)))
+    raw_matrix <- Matrix::as.matrix(cbind(data.frame(pseudotime = t_ordered), t(Y_ordered)))
 
     # df <- data.frame(x = rowMeans(Y_ordered), y = MatrixGenerics::rowVars(Y_ordered))
     # p <- ggplot(df, aes(x = .data[["x"]], y = .data[["y"]])) +
@@ -5395,7 +5395,7 @@ srt_to_adata <- function(srt, features = NULL,
     var[["highly_variable"]] <- features %in% VariableFeatures(srt, assay = assay_X)
   }
 
-  # X <- t(as_matrix(slot(srt@assays[[assay_X]], slot_X)[features, , drop = FALSE]))
+  # X <- t(Matrix::as.matrix(slot(srt@assays[[assay_X]], slot_X)[features, , drop = FALSE]))
   X <- t(GetAssayData(srt, assay = assay_X, slot = slot_X)[features, , drop = FALSE])
   adata <- sc$AnnData(
     X = np_array(X, dtype = np$float32),
@@ -5574,7 +5574,7 @@ adata_to_srt <- function(adata) {
         next
       }
       if (!inherits(obsm, "matrix")) {
-        obsm <- as_matrix(obsm)
+        obsm <- Matrix::as.matrix(obsm)
       }
       k <- gsub(pattern = "^X_", replacement = "", x = py_to_r_auto(k))
       colnames(obsm) <- paste0(k, "_", seq_len(ncol(obsm)))
@@ -5623,7 +5623,7 @@ adata_to_srt <- function(adata) {
         next
       }
       if (!inherits(varm, "matrix")) {
-        varm <- as_matrix(varm)
+        varm <- Matrix::as.matrix(varm)
       }
       colnames(varm) <- paste0(py_to_r_auto(k), "_", seq_len(ncol(varm)))
       rownames(varm) <- py_to_r_auto(adata$var_names$values)
@@ -5644,7 +5644,7 @@ adata_to_srt <- function(adata) {
         next
       }
       if (!inherits(varp, "matrix")) {
-        varp <- as_matrix(varp)
+        varp <- Matrix::as.matrix(varp)
       }
       colnames(varp) <- py_to_r_auto(adata$var_names$values)
       rownames(varp) <- py_to_r_auto(adata$var_names$values)
